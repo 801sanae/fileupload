@@ -15,7 +15,7 @@
 	<mvc:annotation-driven />
 
 	<!-- the mvc resources tag does the magic 파일업로드처리3 -->
- 	<mvc:resources mapping="/product-images/**" location="file:/temp/" />
+ 	<mvc:resources mapping="/profile-images/**" location="file:/temp/" />
  
 	<context:annotation-config />
 	<context:component-scan base-package="com.bit2015.fileupload" />

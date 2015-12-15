@@ -9,36 +9,35 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class FileUploadController {
 	
 	private static final Log LOG = LogFactory.getLog( FileUploadController.class );
-	private static final String SAVE_PATH = "/temp";
+	private static final String SAVE_PATH = "/temp/";
 	  
 	@RequestMapping( "/form" )
 	public String form() {
 		return "form";
 	}
-	
+		
 	@RequestMapping( "/upload" )
-	public String upload( @RequestParam String email, @RequestParam( "file1" ) MultipartFile file1, Model model ) {
+	public String upload( @RequestParam String email, @RequestParam String name, @RequestParam( "uploadFile" ) MultipartFile multipartFile, Model model ) {
         
 		// 단순 파라미터 값
 		LOG.debug( " ######## email : " + email );
+		LOG.debug( " ######## name : " + name );
 
-		// 첫 번째 파일 처리
-		if( file1.isEmpty() == false ) {
+		// 파일 처리
+		if( multipartFile.isEmpty() == false ) {
 			
-	        String fileOriginalName = file1.getOriginalFilename();
+	        String fileOriginalName = multipartFile.getOriginalFilename();
 	        String extName = fileOriginalName.substring( fileOriginalName.lastIndexOf(".") + 1, fileOriginalName.length() );
-	        String fileName = file1.getName();
-	        Long size = file1.getSize();
+	        String fileName = multipartFile.getName();
+	        Long size = multipartFile.getSize();
 	        
 	        String saveFileName = genSaveFileName( extName );
-	        String url = "product-images/" + saveFileName;
 	
 	        LOG.debug( " ######## fileOriginalName : " + fileOriginalName );
 	        LOG.debug( " ######## fileName : " + fileName );
@@ -46,9 +45,10 @@ public class FileUploadController {
 	        LOG.debug( " ######## fileExtensionName : " + extName );
 	        LOG.debug( " ######## saveFileName : " + saveFileName );        
 	
-	        writeFile( file1, SAVE_PATH, saveFileName );
+	        writeFile( multipartFile, SAVE_PATH, saveFileName );
 	        
-	        model.addAttribute( "productImageUrl1", url );
+	        String url = "/profile-images/" + saveFileName;
+	        model.addAttribute( "profileUrl", url );
 		}
 		
 		
@@ -59,7 +59,7 @@ public class FileUploadController {
 		FileOutputStream fos = null;
 		try {
 			byte fileData[] = file.getBytes();
-			fos = new FileOutputStream( path + "\\" + fileName );
+			fos = new FileOutputStream( path + fileName );
 			fos.write(fileData);
 		} catch (Exception e) {
 			e.printStackTrace();

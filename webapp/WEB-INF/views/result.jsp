@@ -12,8 +12,8 @@
 	<h1>Upload completed</h1>
 
 	<div class="result-images">
-		<c:if test="${not empty productImageUrl1 }">
-			<img src="${pageContext.request.contextPath }/${productImageUrl1 }" style="width:150px"><br>
+		<c:if test="${not empty profileUrl }">
+			<img src="${pageContext.request.contextPath }${profileUrl }" style="width:150px"><br>
 		</c:if>
 	</div>
 
