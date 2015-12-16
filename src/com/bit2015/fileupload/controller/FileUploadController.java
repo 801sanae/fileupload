@@ -7,24 +7,65 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class FileUploadController {
 	
 	private static final Log LOG = LogFactory.getLog( FileUploadController.class );
-	private static final String SAVE_PATH = "/temp/";
+	private static final String SAVE_PATH = "/temp/"; //절대경로는 좋지 않다. 실행한 드라이버를 붙여준다.
 	  
 	@RequestMapping( "/form" )
 	public String form() {
 		return "form";
 	}
+	
+	@RequestMapping("/forms")
+	public String forms(){
+		return "forms"; 
+	}
 		
+	@ResponseBody
+	@RequestMapping( "/uploads" )
+	public String uploads( @RequestParam String email, @RequestParam String name, @RequestParam( "uploadFile" ) MultipartFile[] multipartFiles, Model model ) {
+        for(MultipartFile multipartFile : multipartFiles)
+        	// 파일 처리
+    		if( multipartFile.isEmpty() == false ) {
+    			
+    	        String fileOriginalName = multipartFile.getOriginalFilename();
+    	        String extName = fileOriginalName.substring( fileOriginalName.lastIndexOf(".") + 1, fileOriginalName.length() );
+    	        String fileName = multipartFile.getName();
+    	        Long size = multipartFile.getSize();
+    	        
+    	        String saveFileName = genSaveFileName( extName );
+    	
+    	        LOG.debug( " ######## fileOriginalName : " + fileOriginalName );
+    	        LOG.debug( " ######## fileName : " + fileName );
+    	        LOG.debug( " ######## fileSize : " + size );
+    	        LOG.debug( " ######## fileExtensionName : " + extName );
+    	        LOG.debug( " ######## saveFileName : " + saveFileName );        
+    	
+    	        writeFile( multipartFile, SAVE_PATH, saveFileName );
+    	        
+    	        String url = "/profile-images/" + saveFileName;
+    	        model.addAttribute( "profileUrl", url );
+    		}
+		return "file cnt : " + multipartFiles.length;
+	}
+	
 	@RequestMapping( "/upload" )
-	public String upload( @RequestParam String email, @RequestParam String name, @RequestParam( "uploadFile" ) MultipartFile multipartFile, Model model ) {
+	public String upload( 
+//			@RequestParam String email, @RequestParam String name, @RequestParam( "uploadFile" ) MultipartFile multipartFile,
+			@ModelAttribute BoardVo vo, MultipartFile multipartFile,
+			Model model ) {
         
+		String email = vo.getEmail(); String name = vo.getName(); 
+//		MultipartFile multipartFile = vo.getUploadFile();
+		
 		// 단순 파라미터 값
 		LOG.debug( " ######## email : " + email );
 		LOG.debug( " ######## name : " + name );
